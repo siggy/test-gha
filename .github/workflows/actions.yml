@@ -34,7 +34,8 @@ jobs:
           if [[ ${{ github.ref }} == refs/heads/* ]]; then
             # merge
             # "ref": "refs/heads/test-gha-2.02",
-            scope=${${{github.ref}}#refs/heads/}
+            github_ref=${{github.ref}}
+            scope=${github_ref#refs/heads/}
           elif [[ ${{ github.ref }} == refs/tags/* ]]; then
             # tag
             # "ref": "refs/tags/test-gha-2.02-tag1",
