@@ -14,6 +14,36 @@ on:
 
 jobs:
 
+  scope:
+    name: get scope
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+    - name: Generate tag
+      id: tag
+      run: echo "tag=$(CI_FORCE_CLEAN=1 bin/root-tag)" >> "$GITHUB_OUTPUT"
+
+    - name: get scope
+      run: |
+        scope="unknown"
+        if [ ${{ github.event_name }} == "pull_request" ]
+          // pr
+          scope=${{github.base_ref}}
+        elif [ ${{ github.event_name }} == "push" ]
+          if [[ ${{ github.ref }} == refs/heads/* ]]
+            // merge
+            // "ref": "refs/heads/test-gha-2.02",
+            scope=${${{github.ref}}#refs/heads/}
+          elif [[ ${{ github.ref }} == refs/tags/* ]]
+            // tag
+            // "ref": "refs/tags/test-gha-2.02-tag1",
+            scope=${{ steps.tag.outputs.tag }}
+          fi
+        fi
+
+        echo Scope: $scope
+
   dump:
     name: dump info
     runs-on: ubuntu-22.04
