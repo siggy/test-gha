@@ -17,13 +17,7 @@ jobs:
   scope:
     name: get scope
     runs-on: ubuntu-22.04
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
     steps:
-    - name: Generate tag
-      id: tag
-      run: echo "tag=$(CI_FORCE_CLEAN=1 bin/root-tag)" >> "$GITHUB_OUTPUT"
-
     - name: get scope
       run: |
         scope="unknown"
@@ -31,15 +25,17 @@ jobs:
           # pr
           scope=${{github.base_ref}}
         elif [ ${{ github.event_name }} == "push" ]; then
+          github_ref=${{github.ref}}
+
           if [[ ${{ github.ref }} == refs/heads/* ]]; then
             # merge
             # "ref": "refs/heads/test-gha-2.02",
-            github_ref=${{github.ref}}
             scope=${github_ref#refs/heads/}
           elif [[ ${{ github.ref }} == refs/tags/* ]]; then
             # tag
-            # "ref": "refs/tags/test-gha-2.02-tag1",
-            scope=${{ steps.tag.outputs.tag }}
+            # "ref": "refs/tags/test-gha-2.02.12-tag1",
+            github_tag=${github_ref#refs/tags/}
+            scope=$(echo "$github_tag" | cut -d '.' -f 1,2)
           fi
         fi
 
