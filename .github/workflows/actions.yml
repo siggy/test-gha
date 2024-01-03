@@ -20,5 +20,6 @@ jobs:
     steps:
     - name: Dump
       run: |
-        echo "${{ env }}"
-        echo "${{ github }}"
+        echo "${{ toJson(env) }}"
+        echo "${{ toJson(github) }}"
+        echo "${{ toJson(job) }}"
