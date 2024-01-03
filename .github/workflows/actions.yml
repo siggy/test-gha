@@ -1,0 +1,24 @@
+name: Actions
+
+on:
+  push:
+    branches:
+    - main
+    - 'test-gha-2.*'
+    tags:
+    - 'test-gha-2.*'
+  pull_request:
+    branches:
+    - main
+    - 'test-gha-2.*'
+
+jobs:
+
+  dump:
+    name: dump info
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Dump
+      run: |
+        echo "${{ env }}"
+        echo "${{ github }}"
