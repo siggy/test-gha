@@ -4,13 +4,12 @@ on:
   push:
     branches:
     - main
-    - 'test-gha-2.*'
+    - 'enterprise-2.*'
+    - 'preview-*'
     tags:
-    - 'test-gha-2.*'
-  pull_request:
-    branches:
-    - main
-    - 'test-gha-2.*'
+    - 'enterprise-2.*'
+    - 'preview-*'
+  pull_request: {}
 
 jobs:
 
