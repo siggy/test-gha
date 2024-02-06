@@ -18,28 +18,39 @@ jobs:
     name: get scope
     runs-on: ubuntu-22.04
     steps:
-    - name: get scope
+    - name: Generate scope
+      id: scope
       run: |
         scope="unknown"
-        if [ ${{ github.event_name }} == "pull_request" ]; then
-          # pr
+        if [ ${{ github.event_name }} = pull_request ]; then
+          # pr (main or enterprise-2.XX)
           scope=${{github.base_ref}}
-        elif [ ${{ github.event_name }} == "push" ]; then
+        elif [ ${{ github.event_name }} = push ]; then
           github_ref=${{github.ref}}
-
           if [[ ${{ github.ref }} == refs/heads/* ]]; then
-            # merge
-            # "ref": "refs/heads/test-gha-2.02",
+            # merge (main or enterprise-2.XX)
             scope=${github_ref#refs/heads/}
-          elif [[ ${{ github.ref }} == refs/tags/* ]]; then
-            # tag
-            # "ref": "refs/tags/test-gha-2.02.12-tag1",
+          elif [[ ${{ github.ref }} == refs/tags/enterprise-2.* ]]; then
+            # tag (enterprise-2.XX)
             github_tag=${github_ref#refs/tags/}
             scope=$(echo "$github_tag" | cut -d '.' -f 1,2)
+          elif [[ ${{ github.ref }} == refs/tags/preview-* ]]; then
+            # tag (main)
+            scope=main
           fi
         fi
-
+        echo "scope=$scope" >> "$GITHUB_OUTPUT"
         echo Scope: $scope
+
+    - name: Generate channel
+      id: channel
+      run: |
+        channel=enterprise
+        if [ ${{ steps.scope.outputs.scope }} = main ]; then
+          channel=preview
+        fi
+        echo "channel=$channel" >> "$GITHUB_OUTPUT"
+        echo Channel: $channel
 
   dump:
     name: dump info
